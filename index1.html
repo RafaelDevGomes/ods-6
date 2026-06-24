@@ -1,0 +1,721 @@
+```html
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Plataforma ODS 6 - Saneamento e Água Potável</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/js/all.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary: #1d4ed8;
+            --primary-hover: #1e40af;
+            --secondary: #0ea5e9;
+            --dark: #1e293b;
+            --light: #f8fafc;
+            --accent: #e11d48;
+            --gray: #64748b;
+            --border: #e2e8f0;
+            --line-height: 1.6;
+        }
+
+        .high-contrast {
+            --primary: #0000ff;
+            --primary-hover: #000080;
+            --secondary: #ffff00;
+            --dark: #000000;
+            --light: #ffffff;
+            --accent: #ff0000;
+            --gray: #ffffff;
+            --border: #ffffff;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
+        body {
+            background-color: var(--light);
+            color: var(--dark);
+            line-height: var(--line-height);
+        }
+
+        /* Acessibilidade */
+        .sr-only {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
+
+        /* Header e Navegação */
+        header {
+            background-color: var(--dark);
+            color: white;
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        .nav-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: var(--secondary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+        nav ul {
+            display: flex;
+            list-style: none;
+            gap: 1.5rem;
+            align-items: center;
+        }
+
+        nav a {
+            color: #cbd5e1;
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s;
+            padding: 0.5rem;
+        }
+
+        nav a:hover, nav a:focus {
+            color: white;
+            outline: 2px solid var(--secondary);
+        }
+
+        .btn-contrast {
+            background: transparent;
+            border: 2px solid var(--secondary);
+            color: var(--secondary);
+            padding: 0.5rem 1rem;
+            cursor: pointer;
+            border-radius: 4px;
+            font-weight: bold;
+        }
+
+        .btn-contrast:hover {
+            background: var(--secondary);
+            color: var(--dark);
+        }
+
+        /* Seção Hero */
+        .hero {
+            background: linear-gradient(rgba(30, 41, 59, 0.8), rgba(30, 41, 59, 0.9)), url('https://images.unsplash.com/photo-1548880338-73ec9da0a76a?auto=format&fit=crop&w=1200&q=80') center/cover;
+            color: white;
+            padding: 8rem 2rem;
+            text-align: center;
+        }
+
+        .hero-content {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 3rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .hero p {
+            font-size: 1.25rem;
+            margin-bottom: 2rem;
+            color: #cbd5e1;
+        }
+
+        .btn-cta {
+            background-color: var(--primary);
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 4px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.3s;
+        }
+
+        .btn-cta:hover {
+            background-color: var(--primary-hover);
+        }
+
+        /* Container Principal */
+        main {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 4rem 2rem;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 2.25rem;
+            margin-bottom: 3rem;
+            position: relative;
+            padding-bottom: 1rem;
+        }
+
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background-color: var(--secondary);
+        }
+
+        /* Grid de Cards */
+        .grid-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin-bottom: 4rem;
+        }
+
+        .card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            padding: 2rem;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+        }
+
+        .card h3 {
+            margin-bottom: 1rem;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Estudo de Caso e Abas */
+        .case-study {
+            background: white;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            padding: 2rem;
+            margin-top: 4rem;
+        }
+
+        .tabs {
+            display: flex;
+            border-bottom: 2px solid var(--border);
+            margin-bottom: 2rem;
+            overflow-x: auto;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            padding: 1rem 2rem;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--gray);
+            border-bottom: 4px solid transparent;
+            white-space: nowrap;
+        }
+
+        .tab-btn.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .split-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+        }
+
+        @media (max-width: 768px) {
+            .split-layout {
+                grid-template-columns: 1fr;
+            }
+            .nav-container {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            nav ul {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+        }
+
+        /* Bloco de Citação */
+        blockquote {
+            background: var(--light);
+            border-left: 4px solid var(--secondary);
+            padding: 1.5rem;
+            margin: 1.5rem 0;
+            font-style: italic;
+        }
+
+        /* Tabela Comparativa */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 1.5rem 0;
+        }
+
+        th, td {
+            border: 1px solid var(--border);
+            padding: 1rem;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--light);
+            font-weight: bold;
+        }
+
+        /* Formulário Simulador */
+        .simulator-form {
+            background: var(--light);
+            padding: 2rem;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-top: 3rem;
+        }
+
+        .alert-banner {
+            background-color: #fee2e2;
+            border: 1px solid #fecaca;
+            color: #991b1b;
+            padding: 1rem;
+            border-radius: 4px;
+            margin-bottom: 1.5rem;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 1rem;
+        }
+
+        .btn-submit {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 4px;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        /* Seção Quiz */
+        .quiz-section {
+            background: #e0f2fe;
+            padding: 3rem 2rem;
+            border-radius: 8px;
+            margin-top: 4rem;
+        }
+
+        .quiz-options {
+            display: grid;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .quiz-opt {
+            background: white;
+            border: 2px solid var(--border);
+            padding: 1rem;
+            border-radius: 4px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 1rem;
+            transition: all 0.2s;
+        }
+
+        .quiz-opt:hover {
+            border-color: var(--secondary);
+            background: #f0f9ff;
+        }
+
+        /* FAQ Acordeão */
+        .faq-section {
+            margin-top: 4rem;
+        }
+
+        details {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            margin-bottom: 1rem;
+            padding: 1rem;
+        }
+
+        summary {
+            font-weight: bold;
+            cursor: pointer;
+            outline: none;
+        }
+
+        details[open] summary {
+            margin-bottom: 1rem;
+            color: var(--primary);
+        }
+
+        /* Rodapé */
+        footer {
+            background-color: var(--dark);
+            color: #94a3b8;
+            padding: 4rem 2rem 2rem;
+            margin-top: 6rem;
+            border-top: 4px solid var(--secondary);
+        }
+
+        .footer-grid {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 3rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid #334155;
+        }
+
+        .footer-col h4 {
+            color: white;
+            margin-bottom: 1.5rem;
+        }
+
+        .footer-col ul {
+            list-style: none;
+        }
+
+        .footer-col ul li {
+            margin-bottom: 0.75rem;
+        }
+
+        .footer-col a {
+            color: #94a3b8;
+            text-decoration: none;
+        }
+
+        .footer-col a:hover {
+            color: white;
+        }
+
+        .footer-bottom {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-top: 2rem;
+            text-align: center;
+            font-size: 0.9rem;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="nav-container">
+            <a href="#" class="logo" aria-label="Plataforma ODS 6 Home">
+                <i class="fas fa-tint"></i> Plataforma ODS 6
+            </a>
+            <nav>
+                <ul>
+                    <li><a href="#home">Home</a></li>
+                    <li><a href="#metas">Metas Globais</a></li>
+                    <li><a href="#estudo">Estudo Amapá</a></li>
+                    <li><a href="#quiz">Quiz</a></li>
+                    <li><a href="#faq">FAQ</a></li>
+                    <li><button class="btn-contrast" onclick="toggleContrast()" aria-label="Alternar alto contraste">Contraste</button></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <section class="hero" id="home">
+        <div class="hero-content">
+            <h1>Água Potável e Saneamento para Todos</h1>
+            <p>Garantir a disponibilidade e a gestão sustentável da água e do saneamento, mapeando os maiores desafios globais e as realidades críticas do nosso território.</p>
+            <a href="#estudo" class="btn-cta">Explore o Estudo de Caso do Amapá</a>
+        </div>
+    </section>
+
+    <main>
+        <section id="metas">
+            <h2 class="section-title">O Cenário do Saneamento</h2>
+            <div class="grid-cards">
+                <div class="card">
+                    <h3><i class="fas fa-globe-americas"></i> Metas ODS 6</h3>
+                    <p>Alcançar o acesso universal e equitativo a água potável e segura, além de acesso a saneamento e higiene adequados para todos até 2030.</p>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-exclamation-triangle"></i> Perdas na Rede</h3>
+                    <p>O desperdício de água tratada no Brasil é um gargalo invisível. Em média, mais de 40% da água limpa se perde antes de chegar às torneiras devido a vazamentos e fraudes.</p>
+                </div>
+                <div class="card">
+                    <h3><i class="fas fa-chart-line"></i> Painel Raio-X</h3>
+                    <p>A discrepância regional expõe desigualdades profundas entre capitais que cumprem o Marco Legal e regiões periféricas ou isoladas que operam em estado crítico.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="estudo" class="case-study">
+            <h2 class="section-title">Estudo de Caso: A Crise no Amapá</h2>
+            
+            <div class="split-layout" style="margin-bottom: 3rem; align-items: center;">
+                <div>
+                    <p>O Amapá enfrenta uma das realidades mais severas do país quando o assunto é infraestrutura hídrica. Com apenas 12,06% dos domicílios conectados à rede de esgotamento sanitário, a população convive diariamente com a escassez de água tratada e os riscos associados à falta de saneamento básico.</p>
+                    <blockquote>
+                        "O estado registra um índice alarmante de <strong>53,7% de desperdício</strong> de água tratada nas redes de distribuição."
+                    </blockquote>
+                </div>
+                <div style="background: white; padding: 1rem; border-radius: 8px; border: 1px solid var(--border);">
+                    <canvas id="chartPerdas" style="max-height: 250px;"></canvas>
+                </div>
+            </div>
+
+            <div class="tabs" role="tablist">
+                <button class="tab-btn active" role="tab" aria-selected="true" onclick="switchTab(event, 'macapa')">Saneamento em Macapá</button>
+                <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab(event, 'quilombolas')">Vozes Quilombolas</button>
+                <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab(event, 'ribeirinhos')">Isolamento de Bailique</button>
+                <button class="tab-btn" role="tab" aria-selected="false" onclick="switchTab(event, 'privatizacao')">De CAESA para CSA</button>
+            </div>
+
+            <div id="macapa" class="tab-content active" role="tabpanel">
+                <div class="split-layout">
+                    <div>
+                        <h4>Desafios Urbanos na Capital</h4>
+                        <p>Nos bairros periféricos de Macapá, como o Jardim Marco Zero e São José, o desabastecimento é uma crônica rotineira. Moradores relatam redes intermitentes, forçando o armazenamento improvisado e expondo famílias a águas sem garantias de potabilidade.</p>
+                    </div>
+                    <div>
+                        <h4>Relatos Reais</h4>
+                        <p>Histórias de jovens e adultos que dependem de banhos de cuia ou da compra de galões de água mineral comprometem a renda familiar e evidenciam a falha estrutural urbana crônica na manutenção básica dos sistemas pela concessionária.</p>
+                    </div>
+                </div>
+            </div>
+
+            <div id="quilombolas" class="tab-content" role="tabpanel">
+                <h4>O Cenário no Rio Curiaú</h4>
+                <p>Comunidades quilombolas tradicionais enfrentam contaminação e falta de redes estruturadas. Relatos locais expõem o uso de fossas sépticas rudimentares e o escoamento irregular que ameaça diretamente os mananciais que abastecem a região.</p>
+                <blockquote>
+                    "A falta de fiscalização e de investimento público direcionado empurra as comunidades tradicionais para o uso de soluções improvisadas que poluem o ecossistema fluvial local."
+                </blockquote>
+            </div>
+
+            <div id="ribeirinhos" class="tab-content" role="tabpanel">
+                <h4>Crise Hídrica e Climática no Arquipélago</h4>
+                <p>O distrito de Bailique sofre com o fenômeno da 'salinização' e do assoreamento dos rios. Comunidades ribeirinhas encontram-se isoladas geograficamente, impactando o funcionamento de escolas e o acesso à água potável básica de sobrevivência.</p>
+            </div>
+
+            <div id="privatizacao" class="tab-content" role="tabpanel">
+                <h4>A Transição do Modelo de Gestão</h4>
+                <p>A concessão dos serviços da Companhia de Água e Esgoto do Amapá (CAESA) para o consórcio privado CSA gerou intensos debates socioeconômicos sobre a universalização das metas.</p>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Indicador / Aspecto</th>
+                            <th>Modelo Estatal Histórico</th>
+                            <th>Meta de Concessão Privada</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Cobertura de Esgoto</td>
+                            <td>Apenas ~12%</td>
+                            <td>Universalização progressiva</td>
+                        </tr>
+                        <tr>
+                            <td>Foco Geográfico</td>
+                            <td>Zonas urbanas centralizadas</td>
+                            <td>Desafio em zonas rurais/dispersas</td>
+                        </tr>
+                        <tr>
+                            <td>Investimento Inicial</td>
+                            <td>Limitado pelo orçamento público</td>
+                            <td>Aporte via consórcio privado</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="simulator-form">
+                <div class="alert-banner">
+                    <i class="fas fa-exclamation-circle"></i> ESTE É UM SIMULADOR EDUCACIONAL. SEUS DADOS NÃO SERÃO SALVOS OU ENVIADOS.
+                </div>
+                <h3>Central de Denúncias Educativa</h3>
+                <form onsubmit="event.preventDefault(); alert('Simulação concluída com sucesso!');">
+                    <div class="form-group">
+                        <label for="tipo">Tipo de Ocorrência</label>
+                        <select id="tipo" class="form-control">
+                            <option>Falta de Água</option>
+                            <option>Esgoto a Céu Aberto</option>
+                            <option>Poluição Fluvial</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label for="local">Localidade / Bairro</label>
+                        <input type="text" id="local" class="form-control" placeholder="Ex: Jardim Marco Zero, Macapá">
+                    </div>
+                    <div class="form-group">
+                        <label for="desc">Descrição do Problema</label>
+                        <textarea id="desc" class="form-control" rows="3" placeholder="Descreva brevemente a situação..."></textarea>
+                    </div>
+                    <button type="submit" class="btn-submit">Enviar Denúncia Simulada</button>
+                </form>
+            </div>
+        </section>
+
+        <section id="quiz" class="quiz-section">
+            <h2><i class="fas fa-lightbulb"></i> Quiz: Consumo Consciente</h2>
+            <p>Qual das seguintes atitudes gera o maior impacto individual na redução do desperdício de água potável no dia a dia?</p>
+            <div class="quiz-options">
+                <button class="quiz-opt" onclick="checkQuiz(true)">A) Corrigir imediatamente vazamentos domésticos e goteiras em torneiras.</button>
+                <button class="quiz-opt" onclick="checkQuiz(false)">B) Utilizar copos descartáveis para evitar lavar louça.</button>
+                <button class="quiz-opt" onclick="checkQuiz(false)">C) Reduzir o tempo de banho em apenas 5 segundos semanalmente.</button>
+            </div>
+            <div id="quiz-feedback" style="margin-top: 1rem; font-weight: bold;"></div>
+        </section>
+
+        <section id="faq" class="faq-section">
+            <h2 class="section-title">Perguntas Frequentes (FAQ)</h2>
+            <details>
+                <summary>O que determina o Marco Legal do Saneamento?</summary>
+                <p>O Marco Legal estipula metas de universalização que preveem que 99% da população brasileira tenha acesso à água potável e 90% ao esgotamento sanitário até 2033.</p>
+            </details>
+            <details>
+                <summary>Como o desperdício de água impacta os custos públicos?</summary>
+                <p>As perdas na distribuição exigem maior captação e tratamento químico da água que nunca chegará ao consumidor final, encarecendo a tarifa operacional global do sistema.</p>
+            </details>
+            <details>
+                <summary>Qual a relação entre saneamento básico e saúde pública?</summary>
+                <p>A falta de saneamento adequado está diretamente ligada à proliferação de doenças de veiculação hídrica, aumentando os índices de internação e sobrecarregando os sistemas de saúde locais.</p>
+            </details>
+        </section>
+    </main>
+
+    <footer>
+        <div class="footer-grid">
+            <div class="footer-col">
+                <h4>Plataforma ODS 6</h4>
+                <p>Ecossistema educativo focado no monitoramento e conscientização do direito universal à água potável e ao esgoto tratado.</p>
+            </div>
+            <div class="footer-col">
+                <h4>Links Úteis</h4>
+                <ul>
+                    <li><a href="#">Trata Brasil</a></li>
+                    <li><a href="#">Nações Unidas (ONU)</a></li>
+                    <li><a href="#">Marco Legal do Saneamento</a></li>
+                </ul>
+            </div>
+            <div class="footer-col">
+                <h4>Projeto Acadêmico</h4>
+                <p>Desenvolvido para fins educacionais em prol da conscientização ambiental hídrica nacional.</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2026 Plataforma ODS 6 - ADS SENAC / CNMA. Todos os direitos reservados para fins de estudo.</p>
+        </div>
+    </footer>
+
+    <script>
+        function toggleContrast() {
+            document.body.classList.toggle('high-contrast');
+        }
+
+        function switchTab(evt, tabId) {
+            const tabContents = document.getElementsByClassName('tab-content');
+            for (let i = 0; i < tabContents.length; i++) {
+                tabContents[i].classList.remove('active');
+            }
+            
+            const tabBtns = document.getElementsByClassName('tab-btn');
+            for (let i = 0; i < tabBtns.length; i++) {
+                tabBtns[i].classList.remove('active');
+                tabBtns[i].setAttribute('aria-selected', 'false');
+            }
+            
+            document.getElementById(tabId).classList.add('active');
+            evt.currentTarget.classList.add('active');
+            evt.currentTarget.setAttribute('aria-selected', 'true');
+        }
+
+        function checkQuiz(isCorrect) {
+            const feedback = document.getElementById('quiz-feedback');
+            if (isCorrect) {
+                feedback.innerHTML = "<span style='color: green;'>Correto! Pequenos vazamentos contínuos representam os maiores desperdícios invisíveis em residências.</span>";
+            } else {
+                feedback.innerHTML = "<span style='color: red;'>Incorreto. Tente novamente analisando o impacto real da ação.</span>";
+            }
+        }
+
+        // Renderização do gráfico usando Chart.js
+        const ctx = document.getElementById('chartPerdas').getContext('2d');
+        new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Amapá', 'Média Nacional'],
+                datasets: [{
+                    label: '% de Perda de Água Tratada',
+                    data: [53.7, 40.3],
+                    backgroundColor: ['#e11d48', '#0ea5e9'],
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        max: 100
+                    }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
+
+```
